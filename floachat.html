@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloatChat - AI-Powered ARGO Ocean Data Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+         :root {
+            --primary: #0066cc;
+            --secondary: #00aaff;
+            --dark: #003366;
+            --light: #f0f8ff;
+            --accent: #00cc99;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #003366 0%, #0066cc 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        /* Header Styles */
+        
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            color: white;
+            font-size: 24px;
+            margin-left: 10px;
+        }
+        
+        .logo-icon {
+            color: var(--accent);
+            font-size: 28px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        
+        .cta-button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+        
+        .cta-button:hover {
+            background: #00b386;
+            transform: translateY(-2px);
+        }
+        /* Hero Section */
+        
+        .hero {
+            padding: 160px 0 100px;
+            color: white;
+            text-align: center;
+        }
+        
+        .hero h2 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            color: #f0f8ff;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .demo-button {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .demo-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        /* Features Section */
+        
+        .features {
+            padding: 100px 0;
+            background: white;
+            border-radius: 40px 40px 0 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h3 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+        
+        .section-title p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h4 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        /* How It Works */
+        
+        .how-it-works {
+            padding: 100px 0;
+            background: var(--light);
+        }
+        
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .step {
+            text-align: center;
+            flex: 1;
+            padding: 0 20px;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        
+        .step:not(:last-child):after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+            opacity: 0.3;
+        }
+        /* Demo Section */
+        
+        .demo {
+            padding: 100px 0;
+            background: white;
+        }
+        
+        .chat-demo {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--light);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chat-header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .chat-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        .chat-messages {
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+        }
+        
+        .user-message {
+            justify-content: flex-end;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 18px;
+        }
+        
+        .ai-message .message-content {
+            background: #e6f2ff;
+            border-top-left-radius: 4px;
+        }
+        
+        .user-message .message-content {
+            background: var(--secondary);
+            color: white;
+            border-top-right-radius: 4px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+        }
+        
+        .chat-input button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        /* Map Section */
+        
+        .map-section {
+            padding: 100px 0;
+            background: var(--light);
+        }
+        
+        #argo-map {
+            height: 500px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .map-info {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        /* CTA Section */
+        
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: white;
+            text-align: center;
+            border-radius: 0 0 40px 40px;
+        }
+        
+        .cta-section h3 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .cta-section p {
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-size: 1.1rem;
+        }
+        /* Footer */
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h4 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: var(--accent);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #999;
+        }
+        /* Modal */
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .modal p {
+            margin-bottom: 30px;
+            color: #666;
+        }
+        
+        .close-modal {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        /* Responsive Design */
+        
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            .nav-links {
+                display: none;
+            }
+            .steps {
+                flex-direction: column;
+                gap: 40px;
+            }
+            .step:not(:last-child):after {
+                display: none;
+            }
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            #argo-map {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <i class="fas fa-water logo-icon"></i>
+                    <h1>FloatChat</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#demo">Demo</a></li>
+                    <li><a href="#map">Ocean Map</a></li>
+                </ul>
+                <button class="cta-button" id="get-started-btn">Get Started</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Discover Ocean Data Through Conversation</h2>
+            <p>FloatChat is an AI-powered interface that helps researchers, educators, and ocean enthusiasts explore and visualize ARGO float data through natural language queries.</p>
+            <div class="hero-buttons">
+                <button class="cta-button" id="try-now-btn">Try FloatChat Now</button>
+                <button class="demo-button" id="view-demo-btn">View Demo</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h3>Powerful Features</h3>
+                <p>FloatChat combines cutting-edge AI with comprehensive ocean data to provide intuitive exploration</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h4>AI-Powered Queries</h4>
+                    <p>Ask questions in plain English about ocean data and get immediate insights</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Interactive Visualizations</h4>
+                    <p>Transform data into beautiful charts, maps, and graphs with simple commands</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h4>Real-time ARGO Data</h4>
+                    <p>Access the latest oceanographic measurements from the global ARGO float network</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-title">
+                <h3>How FloatChat Works</h3>
+                <p>Exploring ocean data has never been easier with our simple three-step process</p>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Ask a Question</h4>
+                    <p>Type your question about ocean data in natural language</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>AI Processing</h4>
+                    <p>Our AI interprets your query and fetches relevant ARGO data</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Get Insights</h4>
+                    <p>Receive visualized answers with interactive charts and explanations</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo" id="demo">
+        <div class="container">
+            <div class="section-title">
+                <h3>Interactive Demo</h3>
+                <p>Experience how FloatChat makes ocean data exploration intuitive and powerful</p>
+            </div>
+            <div class="chat-demo">
+                <div class="chat-header">
+                    <i class="fas fa-robot chat-icon"></i>
+                    <span>FloatChat Assistant</span>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message ai-message">
+                        <div class="message-content">
+                            Hi there! I'm FloatChat, your AI assistant for exploring ARGO ocean data. Try asking me about temperature, salinity, or currents in any ocean region.
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input" placeholder="Ask about ocean data...">
+                    <button id="send-message"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section" id="map">
+        <div class="container">
+            <div class="section-title">
+                <h3>Interactive Ocean Map</h3>
+                <p>Click on any ocean region to explore ARGO data for that location</p>
+            </div>
+            <div id="argo-map"></div>
+            <div class="map-info" id="map-info">
+                <h4>Ocean Data Explorer</h4>
+                <p>Click on any ocean area to view data from the ARGO float network. Each ARGO float provides measurements of temperature, salinity, and currents at various depths.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h3>Ready to Explore the Oceans Like Never Before?</h3>
+            <p>Join researchers, educators, and ocean enthusiasts who are using FloatChat to unlock the secrets of our oceans through conversational data exploration.</p>
+            <button class="cta-button" id="cta-button">Get Started with FloatChat</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>FloatChat</h4>
+                    <p>AI-powered conversational interface for ARGO ocean data discovery and visualization.</p>
+                </div>
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#demo">Demo</a></li>
+                        <li><a href="#map">Ocean Map</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Access</a></li>
+                        <li><a href="#">ARGO Data</a></li>
+                        <li><a href="#">Research Papers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="#">Support</a></li>
+                        <li><a href="#">Partnerships</a></li>
+                        <li><a href="#">Feedback</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 FloatChat. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal" id="signup-modal">
+        <div class="modal-content">
+            <h3>Get Started with FloatChat</h3>
+            <p>Sign up for early access to the FloatChat platform and be among the first to explore ocean data through AI conversation.</p>
+            <form id="signup-form">
+                <input type="email" placeholder="Your email address" required style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 30px;">
+                <button type="submit" class="close-modal">Notify Me</button>
+            </form>
+            <button class="demo-button" style="margin-top: 15px;" id="close-modal">Maybe Later</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // ARGO Ocean Data
+        const oceanData = {
+            pacific: {
+                temperature: "22.5°C (72.5°F) average surface temperature",
+                salinity: "34.7 PSU average salinity",
+                currents: "Major currents: Kuroshio, California, Humboldt, East Australian",
+                depth: "Average depth: 4,280m (14,040ft), Maximum: 10,911m (Mariana Trench)",
+                facts: "The Pacific Ocean is the largest and deepest ocean, covering about 30% of Earth's surface."
+            },
+            atlantic: {
+                temperature: "18.9°C (66.0°F) average surface temperature",
+                salinity: "35.4 PSU average salinity",
+                currents: "Major currents: Gulf Stream, North Atlantic Drift, Canary, Benguela",
+                depth: "Average depth: 3,646m (11,962ft), Maximum: 8,376m (Puerto Rico Trench)",
+                facts: "The Atlantic Ocean is the second largest and saltiest ocean, crucial for global thermohaline circulation."
+            },
+            indian: {
+                temperature: "26.0°C (78.8°F) average surface temperature",
+                salinity: "34.8 PSU average salinity",
+                currents: "Major currents: Agulhas, West Australian, Monsoon Drift",
+                depth: "Average depth: 3,741m (12,274ft), Maximum: 7,258m (Java Trench)",
+                facts: "The Indian Ocean is the warmest ocean, significantly influencing monsoon patterns in Asia."
+            },
+            southern: {
+                temperature: "2.0°C (35.6°F) average surface temperature",
+                salinity: "34.2 PSU average salinity",
+                currents: "Major current: Antarctic Circumpolar Current",
+                depth: "Average depth: 4,500m (14,800ft), Maximum: 7,235m (South Sandwich Trench)",
+                facts: "The Southern Ocean connects the Atlantic, Pacific, and Indian Oceans and plays a key role in global climate regulation."
+            },
+            arctic: {
+                temperature: "-1.5°C (29.3°F) average surface temperature",
+                salinity: "30.5 PSU average salinity",
+                currents: "Major currents: Beaufort Gyre, Transpolar Drift",
+                depth: "Average depth: 1,205m (3,953ft), Maximum: 5,550m (Eurasia Basin)",
+                facts: "The Arctic Ocean is the smallest and shallowest ocean, experiencing significant sea ice loss due to climate change."
+            }
+        };
+
+        // Initialize map
+        function initMap() {
+            const map = L.map('argo-map').setView([20, 0], 2);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Add ocean region polygons with click events
+            const oceanRegions = {
+                pacific: [
+                    [0, -150],
+                    [0, -60],
+                    [60, -150],
+                    [60, -60]
+                ],
+                atlantic: [
+                    [0, -60],
+                    [0, 20],
+                    [60, -60],
+                    [60, 20]
+                ],
+                indian: [
+                    [0, 20],
+                    [0, 120],
+                    [60, 20],
+                    [60, 120]
+                ],
+                southern: [
+                    [-60, -180],
+                    [-60, 180],
+                    [-90, -180],
+                    [-90, 180]
+                ],
+                arctic: [
+                    [60, -180],
+                    [60, 180],
+                    [90, -180],
+                    [90, 180]
+                ]
+            };
+
+            for (const ocean in oceanRegions) {
+                const bounds = oceanRegions[ocean];
+                const polygon = L.polygon([
+                    [bounds[0][0], bounds[0][1]],
+                    [bounds[1][0], bounds[1][1]],
+                    [bounds[2][0], bounds[2][1]],
+                    [bounds[3][0], bounds[3][1]]
+                ], {
+                    color: 'transparent',
+                    fillColor: '#0066cc',
+                    fillOpacity: 0.3,
+                    className: `ocean-region ${ocean}`
+                }).addTo(map);
+
+                polygon.on('click', function(e) {
+                    showOceanData(ocean);
+                });
+            }
+
+            // Add some ARGO float markers
+            const argoFloats = [{
+                lat: 25,
+                lng: -130,
+                ocean: "pacific"
+            }, {
+                lat: 35,
+                lng: -60,
+                ocean: "atlantic"
+            }, {
+                lat: -5,
+                lng: 80,
+                ocean: "indian"
+            }, {
+                lat: -55,
+                lng: 0,
+                ocean: "southern"
+            }, {
+                lat: 75,
+                lng: -150,
+                ocean: "arctic"
+            }];
+
+            argoFloats.forEach(float => {
+                L.marker([float.lat, float.lng])
+                    .addTo(map)
+                    .bindPopup(`<b>ARGO Float</b><br>Monitoring ${float.ocean} ocean<br>Click map for ocean data`)
+                    .openPopup();
+            });
+        }
+
+        // Show ocean data when region is clicked
+        function showOceanData(ocean) {
+            const data = oceanData[ocean];
+            const oceanName = ocean.charAt(0).toUpperCase() + ocean.slice(1);
+
+            document.getElementById('map-info').innerHTML = `
+                <h4>${oceanName} Ocean Data</h4>
+                <p><strong>Temperature:</strong> ${data.temperature}</p>
+                <p><strong>Salinity:</strong> ${data.salinity}</p>
+                <p><strong>Currents:</strong> ${data.currents}</p>
+                <p><strong>Depth:</strong> ${data.depth}</p>
+                <p><strong>Interesting Fact:</strong> ${data.facts}</p>
+            `;
+        }
+
+        // Chatbot functionality
+        function setupChatbot() {
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-message');
+            const chatMessages = document.getElementById('chat-messages');
+
+            function addMessage(message, isUser = false) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+                messageEl.innerHTML = `<div class="message-content">${message}</div>`;
+                chatMessages.appendChild(messageEl);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function getAIResponse(message) {
+                message = message.toLowerCase();
+
+                if (message.includes('temperature')) {
+                    if (message.includes('pacific')) {
+                        return `The Pacific Ocean has an average surface temperature of ${oceanData.pacific.temperature}. The western Pacific is generally warmer due to the Kuroshio Current.`;
+                    } else if (message.includes('atlantic')) {
+                        return `The Atlantic Ocean has an average surface temperature of ${oceanData.atlantic.temperature}. The Gulf Stream carries warm water northward, moderating climates.`;
+                    } else if (message.includes('indian')) {
+                        return `The Indian Ocean is the warmest ocean with ${oceanData.indian.temperature}. Its temperature greatly influences monsoon patterns.`;
+                    } else if (message.includes('southern') || message.includes('antarctic')) {
+                        return `The Southern Ocean is cold with ${oceanData.southern.temperature}. It plays a crucial role in global heat distribution.`;
+                    } else if (message.includes('arctic')) {
+                        return `The Arctic Ocean has ${oceanData.arctic.temperature}. It's experiencing rapid warming due to climate change.`;
+                    } else {
+                        return `Ocean temperatures vary by location and depth. The Pacific averages ${oceanData.pacific.temperature}, Atlantic ${oceanData.atlantic.temperature}, and Indian ${oceanData.indian.temperature}. Would you like information about a specific ocean?`;
+                    }
+                } else if (message.includes('salinity') || message.includes('salt')) {
+                    return `Ocean salinity varies by region. The Atlantic is saltiest (${oceanData.atlantic.salinity}) due to high evaporation. The Arctic has lower salinity (${oceanData.arctic.salinity}) because of freshwater input from melting ice and rivers.`;
+                } else if (message.includes('current') || message.includes('flow')) {
+                    return `Major ocean currents include the Gulf Stream in the Atlantic, Kuroshio in the Pacific, and the Antarctic Circumpolar Current in the Southern Ocean. These currents redistribute heat and influence global climate.`;
+                } else if (message.includes('argo') || message.includes('float')) {
+                    return `ARGO floats are autonomous instruments that drift with ocean currents, measuring temperature, salinity, and pressure. There are about 4,000 ARGO floats globally, providing real-time ocean data.`;
+                } else if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
+                    return `Hello! I'm FloatChat, your AI assistant for exploring ocean data. Ask me about temperature, salinity, currents, or any ocean-related topic!`;
+                } else if (message.includes('help')) {
+                    return `I can help you explore ocean data from the ARGO network. Try asking about:
+- Temperature in specific oceans
+- Salinity levels
+- Ocean currents
+- ARGO float data
+- Or click on the map to explore specific regions`;
+                } else {
+                    return `I can help you explore various ocean data from the ARGO network. Try asking about temperature, salinity, currents, or specific ocean regions. You can also click on the map to explore data by location.`;
+                }
+            }
+
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    chatInput.value = '';
+
+                    // Simulate AI thinking
+                    setTimeout(() => {
+                        const response = getAIResponse(message);
+                        addMessage(response);
+                    }, 1000);
+                }
+            }
+
+            sendButton.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+
+        // Modal functionality
+        function setupModal() {
+            const modal = document.getElementById('signup-modal');
+            const getStartedBtn = document.getElementById('get-started-btn');
+            const tryNowBtn = document.getElementById('try-now-btn');
+            const ctaButton = document.getElementById('cta-button');
+            const closeModalBtn = document.getElementById('close-modal');
+            const signupForm = document.getElementById('signup-form');
+
+            function openModal() {
+                modal.style.display = 'flex';
+            }
+
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+
+            getStartedBtn.addEventListener('click', openModal);
+            tryNowBtn.addEventListener('click', openModal);
+            ctaButton.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', closeModal);
+
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = this.querySelector('input[type="email"]').value;
+                alert(`Thank you! We'll notify you at ${email} when FloatChat is available.`);
+                closeModal();
+            });
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Smooth scrolling for navigation
+        function setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+
+        // View demo button functionality
+        function setupViewDemoButton() {
+            document.getElementById('view-demo-btn').addEventListener('click', function() {
+                document.getElementById('demo').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // Initialize everything when the page loads
+        window.onload = function() {
+            initMap();
+            setupChatbot();
+            setupModal();
+            setupSmoothScrolling();
+            setupViewDemoButton();
+        };
+    </script>
+</body>
+
+</html>
